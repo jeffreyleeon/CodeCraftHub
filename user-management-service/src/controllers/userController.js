@@ -1,3 +1,5 @@
+const { createHash } = require('node:crypto');
+
 const User = require('../models/User');
 
 // GET /api/users
@@ -15,7 +17,12 @@ exports.getUsers = async (req, res) => {
 exports.createUser = async (req, res) => {
   try {
     const { username, password, email } = req.body;
-    const newUser = new User({ username, password, email });
+    const hashedPassword = createHash('sha256').update(password).digest('hex')
+    const newUser = new User({
+      username,
+      password: hashedPassword,
+      email
+    });
     const user = await newUser.save();
     res.json(user);
   } catch (error) {
